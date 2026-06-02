@@ -1,0 +1,29 @@
+/start.txt
+
+# Android / Gradle build outputs
+.gradle/
+build/
+app/build/
+local.properties
+*.iml
+.idea/
+
+# Claude Code project config
+.claude/
+
+# Local fallback snapshots
+sama-fallback-*.tar.gz
+
+# MEGA SDK — source + build inputs (clone/build via mega/BUILD_SDK.md)
+mega/sdk/
+mega/vcpkg/
+mega/build/
+mega/*.log
+mega/*.done
+mega/run_*.sh
+
+# MEGA SDK — generated/built artifacts vendored into the app.
+# Regenerate with mega/BUILD_SDK.md, then place here. Not tracked (30 MB .so
+# binary + 140+ generated bindings).
+app/src/main/jniLibs/
+app/src/megasdk/

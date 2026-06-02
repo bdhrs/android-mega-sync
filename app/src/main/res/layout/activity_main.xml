@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sama — MEGA folder sync"
+        android:textSize="20sp"
+        android:paddingBottom="24dp" />
+
+    <Button
+        android:id="@+id/pickLocal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pick local folder" />
+
+    <Button
+        android:id="@+id/pickRemote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pick MEGA folder" />
+
+    <Button
+        android:id="@+id/syncNow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Sync now" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textIsSelectable="true" />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Log out" />
+
+</LinearLayout>
