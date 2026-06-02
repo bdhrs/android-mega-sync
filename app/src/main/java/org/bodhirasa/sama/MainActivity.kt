@@ -1,6 +1,8 @@
 package org.bodhirasa.sama
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
@@ -21,9 +23,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pairStore: SyncPairStore
     private lateinit var lastSyncStore: LastSyncStore
     private lateinit var status: TextView
+    private lateinit var syncButton: Button
 
     @Volatile
     private var sessionResumed = false
+
+    @Volatile
+    private var syncing = false
+
+    @Volatile
+    private var cancelRequested = false
 
     // Re-establishes the MEGA session on the calling background thread. Safe to
     // call repeatedly; only resumes once per process. Must not run on the UI thread.
@@ -60,10 +69,14 @@ class MainActivity : AppCompatActivity() {
         pairStore = SyncPairStore(this)
         lastSyncStore = LastSyncStore(this)
         status = findViewById(R.id.status)
+        syncButton = findViewById(R.id.syncNow)
+        setSyncButton(cancel = false)
 
         findViewById<Button>(R.id.pickLocal).setOnClickListener { pickLocal.launch(null) }
         findViewById<Button>(R.id.pickRemote).setOnClickListener { browseRemote() }
-        findViewById<Button>(R.id.syncNow).setOnClickListener { syncNow() }
+        syncButton.setOnClickListener {
+            if (syncing) cancelRequested = true else syncNow()
+        }
         findViewById<Button>(R.id.logout).setOnClickListener {
             SessionStore(this).clear()
             startActivity(Intent(this, LoginActivity::class.java))
@@ -106,12 +119,21 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun setSyncButton(cancel: Boolean) {
+        syncButton.text = if (cancel) "Cancel" else "Sync now"
+        syncButton.backgroundTintList =
+            ColorStateList.valueOf(Color.parseColor(if (cancel) "#C62828" else "#2E7D32"))
+    }
+
     private fun syncNow() {
         val pair = pairStore.single()
         if (pair == null || pair.localTreeUri.isEmpty()) {
             status.text = "Pick a local folder first."
             return
         }
+        syncing = true
+        cancelRequested = false
+        setSyncButton(cancel = true)
         status.text = "Syncing…"
         Thread {
             val result = runCatching {
@@ -122,15 +144,19 @@ class MainActivity : AppCompatActivity() {
                 sync.sync(
                     pair.remoteRoot,
                     lastSyncStore.load(pairId),
-                    onProgress = { msg -> runOnUiThread { status.text = msg } }
+                    onProgress = { msg -> runOnUiThread { status.text = msg } },
+                    shouldCancel = { cancelRequested }
                 ).also {
                     lastSyncStore.save(pairId, it.newState)
                 }
             }
             runOnUiThread {
+                syncing = false
+                setSyncButton(cancel = false)
                 status.text = result.fold(
                     onSuccess = {
-                        "Sync done — up ${it.uploaded}, down ${it.downloaded}, " +
+                        val head = if (it.cancelled) "Sync cancelled" else "Sync done"
+                        "$head — up ${it.uploaded}, down ${it.downloaded}, " +
                             "del local ${it.deletedLocal}, del remote ${it.deletedRemote}, " +
                             "dirs ${it.dirsCreated}"
                     },
