@@ -17,8 +17,20 @@ class Synchronizer(
     private val engine: SyncEngine
 ) {
 
-    fun sync(remoteRoot: String, last: LastSyncState): SyncResult {
-        val plan = engine.diff(local.snapshot(), mega.listFolder(remoteRoot), last)
+    // onProgress is called on the calling thread with a short human-readable
+    // status line (scan phases, then "i/N  <action> <path>" per step).
+    fun sync(
+        remoteRoot: String,
+        last: LastSyncState,
+        onProgress: (String) -> Unit = {}
+    ): SyncResult {
+        onProgress("Scanning local files…")
+        val localSnap = local.snapshot()
+        onProgress("Scanning MEGA…")
+        val remoteSnap = mega.listFolder(remoteRoot)
+
+        val plan = engine.diff(localSnap, remoteSnap, last)
+        val total = plan.actions.size
 
         var uploaded = 0
         var downloaded = 0
@@ -26,7 +38,8 @@ class Synchronizer(
         var deletedRemote = 0
         var dirsCreated = 0
 
-        for (action in plan.actions) {
+        plan.actions.forEachIndexed { i, action ->
+            onProgress("${i + 1}/$total  ${label(action)}")
             when (action) {
                 is SyncAction.Upload -> {
                     mega.upload(action.path, local.read(action.path)); uploaded++
@@ -49,8 +62,16 @@ class Synchronizer(
             }
         }
 
-        // Baseline for the next sync: each side's fingerprint after reconciling.
+        onProgress("Finalising…")
         val newState = LastSyncState.pair(local.snapshot(), mega.listFolder(remoteRoot))
         return SyncResult(uploaded, downloaded, deletedLocal, deletedRemote, dirsCreated, newState)
+    }
+
+    private fun label(action: SyncAction): String = when (action) {
+        is SyncAction.Upload -> "↑ ${action.path}"
+        is SyncAction.Download -> "↓ ${action.path}"
+        is SyncAction.DeleteLocal -> "✕ local ${action.path}"
+        is SyncAction.DeleteRemote -> "✕ remote ${action.path}"
+        is SyncAction.MakeDirLocal, is SyncAction.MakeDirRemote -> "+ dir ${action.path}"
     }
 }

@@ -56,9 +56,30 @@ class SdkMegaClient(
                 out.add(FileEntry(path, isDir = true, size = 0, modifiedMillis = child.modificationTime * 1000, fingerprint = Fingerprints.DIR))
                 walk(child, path, out)
             } else {
-                val fp = child.fingerprint ?: "${child.size}:${child.modificationTime}"
-                out.add(FileEntry(path, isDir = false, size = child.size, modifiedMillis = child.modificationTime * 1000, fingerprint = fp))
+                out.add(FileEntry(path, isDir = false, size = child.size, modifiedMillis = child.modificationTime * 1000, fingerprint = remoteContentId(child)))
             }
+        }
+    }
+
+    // Mtime-independent content identity: file size + MEGA's full content CRC.
+    // NOTE: api.getCRC(MegaNode) is buggy in the SDK (sizeof on a pointer ->
+    // only half the CRC), so for the remote side we extract the CRC from the
+    // node's fingerprint via getCRCFromFingerprint, which matches getCRC(path)
+    // used for local files. Same content -> same id, regardless of mtime.
+    private fun contentId(size: Long, crc: String?): String = "$size:${crc ?: "nocrc"}"
+
+    private fun remoteContentId(node: MegaNode): String {
+        val crc = node.fingerprint?.let { api.getCRCFromFingerprint(it) }
+        return contentId(node.size, crc)
+    }
+
+    override fun contentFingerprint(content: ByteArray): String {
+        val temp = File.createTempFile("sama-fp", null, cacheDir)
+        return try {
+            temp.writeBytes(content)
+            contentId(content.size.toLong(), api.getCRC(temp.absolutePath))
+        } finally {
+            temp.delete()
         }
     }
 

@@ -50,4 +50,6 @@ class FakeMegaClient(
     override fun makeDir(remotePath: String) {
         dirs.add(remotePath)
     }
+
+    override fun contentFingerprint(content: ByteArray): String = Fingerprints.of(content)
 }

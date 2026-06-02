@@ -65,6 +65,10 @@ class SyncEngine(
     ) {
         when {
             l != null && r != null -> {
+                // Same content on both sides (mtime-independent) -> already in sync,
+                // regardless of history. This is what lets a first sync skip every
+                // identical file instead of re-transferring by timestamp.
+                if (l.fingerprint == r.fingerprint) return
                 val locChanged = base == null || l.fingerprint != base.local
                 val remChanged = base == null || r.fingerprint != base.remote
                 when {

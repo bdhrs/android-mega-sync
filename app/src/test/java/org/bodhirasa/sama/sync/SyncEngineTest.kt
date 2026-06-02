@@ -91,6 +91,19 @@ class SyncEngineTest {
     }
 
     @Test
+    fun identicalContentNoHistoryIsNoOp() {
+        // The crux fix: first sync of an already-synced vault. Same content
+        // (same fingerprint) on both sides, no baseline -> nothing transfers,
+        // even though mtimes differ.
+        val plan = engine.diff(
+            snap(file("note.md", "same", mtime = 999)),
+            snap(file("note.md", "same", mtime = 1)),
+            LastSyncState.EMPTY
+        )
+        assertTrue(plan.isEmpty)
+    }
+
+    @Test
     fun noHistoryBothExistNewerWins() {
         // First sync, file already differs: newer modification time wins, no conflict copy.
         val plan = engine.diff(

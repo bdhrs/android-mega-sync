@@ -21,4 +21,10 @@ interface MegaClient {
     fun delete(remotePath: String)
 
     fun makeDir(remotePath: String)
+
+    // Content-based, modification-time-independent identity for a file's bytes,
+    // using the same scheme as the fingerprints returned by listFolder, so a
+    // local file and its remote counterpart compare equal when their content is
+    // identical regardless of timestamps.
+    fun contentFingerprint(content: ByteArray): String
 }

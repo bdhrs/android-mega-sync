@@ -10,7 +10,8 @@ import org.bodhirasa.sama.sync.LocalStore
 
 class SafLocalStore(
     private val context: Context,
-    treeUri: Uri
+    treeUri: Uri,
+    private val fingerprint: (ByteArray) -> String
 ) : LocalStore {
 
     private val root: DocumentFile =
@@ -31,7 +32,7 @@ class SafLocalStore(
                 walk(child, path, out)
             } else {
                 val content = readDoc(child)
-                out.add(FileEntry(path, isDir = false, size = child.length(), modifiedMillis = child.lastModified(), fingerprint = Fingerprints.of(content)))
+                out.add(FileEntry(path, isDir = false, size = child.length(), modifiedMillis = child.lastModified(), fingerprint = fingerprint(content)))
             }
         }
     }

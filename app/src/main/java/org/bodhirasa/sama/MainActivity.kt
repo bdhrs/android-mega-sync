@@ -116,9 +116,14 @@ class MainActivity : AppCompatActivity() {
         Thread {
             val result = runCatching {
                 ensureSession()
-                val local = SafLocalStore(this, Uri.parse(pair.localTreeUri))
-                val sync = Synchronizer(MegaClientProvider.get(this), local, SyncEngine())
-                sync.sync(pair.remoteRoot, lastSyncStore.load(pairId)).also {
+                val client = MegaClientProvider.get(this)
+                val local = SafLocalStore(this, Uri.parse(pair.localTreeUri), client::contentFingerprint)
+                val sync = Synchronizer(client, local, SyncEngine())
+                sync.sync(
+                    pair.remoteRoot,
+                    lastSyncStore.load(pairId),
+                    onProgress = { msg -> runOnUiThread { status.text = msg } }
+                ).also {
                     lastSyncStore.save(pairId, it.newState)
                 }
             }
