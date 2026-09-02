@@ -57,7 +57,9 @@ Single developer/user. Sideloaded, self-built, personal. No Play Store, no multi
 
 ## Architecture Notes (for extensibility)
 
-- Model a **sync pair** as a first-class entity (MEGA node handle/path + local SAF tree URI + last-sync state) even though v1 exposes only one. Storing it as a list of one keeps the multi-pair upgrade additive.
+- A **sync pair** is a first-class entity (MEGA path + local SAF tree URI + its own exclusions + its own last-sync state), stored as a list in `SharedPreferences`. Exclusions and last-sync state are separate prefs files keyed by pair id, so a pair's state is addressable without touching the pair record's encoding.
+- **Pair ids are handed out from a stored counter and never reused.** A reissued id would give a new pair a deleted pair's exclusions and sync baseline, and a stale baseline plans deletions. `SyncPairStore.remove` therefore clears the pair, its exclusions and its baseline together.
+- **One sync at a time per process** (`SyncRuns`). Activities are recreated on rotation and can be killed, so a run's state cannot live in one: two runs over the same pair both write its baseline and the loser's need not match what was transferred. The manual button, "Sync all" and `SyncWorker` all take the same lock; the worker returns `retry()` when a manual run holds it.
 - Keep the **sync engine** (diff + reconcile) independent of UI and of the trigger mechanism, so manual button, WorkManager, and future triggers all call the same engine.
 - Isolate MEGA SDK access behind a thin interface so the engine is testable without a live MEGA account where practical.
 

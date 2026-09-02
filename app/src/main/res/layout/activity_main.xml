@@ -1,54 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    style="@style/AppScreen">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Android Mega Sync — MEGA folder sync"
-        android:textSize="20sp"
-        android:paddingBottom="24dp" />
+        style="@style/AppHeading"
+        android:text="Folder pairs" />
 
-    <Button
-        android:id="@+id/pickLocal"
+    <ListView
+        android:id="@+id/pairList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pick local folder" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
 
-    <Button
-        android:id="@+id/pickRemote"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Pick MEGA folder" />
-
-    <Button
-        android:id="@+id/exclusions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Exclusions" />
-
-    <Button
-        android:id="@+id/syncNow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Sync now" />
+    <TextView
+        android:id="@+id/emptyState"
+        style="@style/AppEmptyState"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="No folder pairs yet.\nAdd one to start syncing." />
 
     <TextView
         android:id="@+id/status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:textIsSelectable="true" />
+        style="@style/AppStatus"
+        android:maxLines="10"
+        android:ellipsize="end" />
 
     <Button
-        android:id="@+id/logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Log out" />
+        android:id="@+id/addPair"
+        style="@style/AppButton"
+        android:layout_marginTop="16dp"
+        android:text="Add folder pair" />
+
+    <Button
+        android:id="@+id/syncAll"
+        style="@style/AppButton"
+        android:text="Sync all" />
 
 </LinearLayout>

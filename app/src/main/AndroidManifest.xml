@@ -25,6 +25,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".PairActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ExclusionsActivity"
             android:exported="false" />
 

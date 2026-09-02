@@ -18,19 +18,19 @@ The developer/user personally — a single-user, sideloaded, self-built app. Not
 
 - An installable Android APK (arm64-v8a, sideloaded via adb).
 - A locally built MEGA SDK `.aar` consumed by the app.
-- A single configurable folder pair (one MEGA folder ↔ one local folder) kept in bidirectional sync, triggered manually and on a periodic background schedule.
+- Any number of configurable folder pairs (each one MEGA folder ↔ one local folder, with its own exclusions) kept in bidirectional sync, triggered manually per pair, manually for all pairs, and on a periodic background schedule.
 - A clear, documented build process runnable from the Linux CLI (`./gradlew`), with no Android Studio required.
 
 ## Scope and Extensibility
 
-- **v1 ships a single folder pair.** However, the architecture (data model, sync engine, settings) must be designed so that supporting **multiple folder pairs** later is a natural extension, not a rewrite.
+- **Multiple folder pairs shipped 2026-09-02.** Each pair owns its two folders and its own exclusion list; pair ids key the exclusion and last-sync stores. Only one sync runs at a time in the process, and pair ids are never reused.
 - Bidirectional sync requires a conflict-resolution policy. Default policy: keep both versions, suffixing the losing copy (e.g. `~conflict-<device>-<timestamp>`), never silently overwriting or deleting user data.
 - Obsidian-specific niceties (ignoring `.obsidian/workspace*.json` churn, handling `.trash`) are desirable but secondary to a correct general sync.
 
 ## How We'll Know It Worked
 
 - The app installs on the phone and logs into MEGA with email/password, persisting the session securely (Android Keystore).
-- A user can pick a MEGA folder and a local folder, then run a sync.
+- A user can add folder pairs, pick a MEGA folder and a local folder for each, and run a sync for one pair or for all of them.
 - After a sync, both sides contain the same set of files with matching contents; changes made on either side since the last sync are propagated to the other.
 - Concurrent edits on both sides do not lose data — the conflict policy preserves both copies.
 - Periodic background sync runs on schedule without a foreground service.

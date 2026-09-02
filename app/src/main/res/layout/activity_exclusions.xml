@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    style="@style/AppScreen">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Exclusions"
-        android:textSize="20sp"
-        android:paddingBottom="16dp" />
+        style="@style/AppHeading"
+        android:text="Exclusions" />
 
     <ListView
         android:id="@+id/exclusionList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+    <TextView
+        android:id="@+id/emptyState"
+        style="@style/AppEmptyState"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Nothing excluded.\nBrowse a side to leave folders out of the sync." />
 
     <Button
         android:id="@+id/browseSource"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/AppButton"
         android:layout_marginTop="16dp"
-        android:text="Browse Local" />
+        android:text="Browse local" />
 
     <Button
         android:id="@+id/browseDestination"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/AppButton"
         android:text="Browse MEGA" />
 
 </LinearLayout>

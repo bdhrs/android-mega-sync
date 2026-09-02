@@ -12,4 +12,8 @@ class LastSyncStore(context: Context) {
     fun save(pairId: String, state: LastSyncState) {
         prefs.edit().putString(pairId, LastSyncCodec.encode(state)).apply()
     }
+
+    fun remove(pairId: String) {
+        prefs.edit().remove(pairId).apply()
+    }
 }

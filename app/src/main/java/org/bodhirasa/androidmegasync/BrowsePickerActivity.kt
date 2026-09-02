@@ -48,14 +48,19 @@ class BrowsePickerActivity : AppCompatActivity() {
 
         root = intent.getStringExtra(EXTRA_ROOT) ?: ROOT_LOCAL
         title = if (root == ROOT_LOCAL) "Browse Local" else "Browse MEGA"
-        val storedPair = SyncPairStore(this).single()
+        val pairId = intent.getStringExtra(EXTRA_PAIR_ID)
+        if (pairId == null) {
+            finish()
+            return
+        }
+        val storedPair = SyncPairStore(this).find(pairId)
         if (storedPair == null || (root == ROOT_LOCAL && storedPair.localTreeUri.isEmpty())) {
             status.text = "Pick a folder on this side first."
             excludeButton.isEnabled = false
             return
         }
         pair = storedPair
-        selected.addAll(ExclusionStore(this).load())
+        selected.addAll(ExclusionStore(this).load(pairId))
 
         excludeButton.setOnClickListener {
             setResult(Activity.RESULT_OK, Intent().putStringArrayListExtra(EXTRA_SELECTED_PATHS, ArrayList(selected)))
@@ -94,9 +99,7 @@ class BrowsePickerActivity : AppCompatActivity() {
                 .map { (name, isDir) -> name to isDir }
         } else {
             val client = MegaClientProvider.get(this)
-            if (client.currentSession() == null) {
-                SessionStore(this).token?.let { client.resumeSession(it) }
-            }
+            MegaSession.ensure(this)
             val entries = remoteEntries ?: client.listFolder(pair.remoteRoot).entries.also { remoteEntries = it }
             entries.filter { it.path.substringBeforeLast('/', "") == path }
                 .map { it.path.substringAfterLast('/') to it.isDir }
@@ -141,6 +144,7 @@ class BrowsePickerActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ROOT = "root"
+        const val EXTRA_PAIR_ID = "pair_id"
         const val EXTRA_SELECTED_PATHS = "selected_paths"
         const val ROOT_LOCAL = "local"
         const val ROOT_REMOTE = "remote"

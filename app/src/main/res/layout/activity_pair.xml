@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        style="@style/AppScreen"
+        android:layout_height="wrap_content">
+
+        <TextView
+            style="@style/AppLabel"
+            android:paddingTop="0dp"
+            android:text="Local folder" />
+
+        <TextView
+            android:id="@+id/localValue"
+            style="@style/AppValue" />
+
+        <Button
+            android:id="@+id/pickLocal"
+            style="@style/AppButton"
+            android:text="Pick local folder" />
+
+        <TextView
+            style="@style/AppLabel"
+            android:text="MEGA folder" />
+
+        <TextView
+            android:id="@+id/remoteValue"
+            style="@style/AppValue" />
+
+        <Button
+            android:id="@+id/pickRemote"
+            style="@style/AppButton"
+            android:text="Pick MEGA folder" />
+
+        <Button
+            android:id="@+id/exclusions"
+            style="@style/AppButton"
+            android:layout_marginTop="24dp"
+            android:text="Exclusions" />
+
+        <Button
+            android:id="@+id/syncNow"
+            style="@style/AppButton"
+            android:layout_marginTop="16dp"
+            android:text="Sync now" />
+
+        <TextView
+            android:id="@+id/status"
+            style="@style/AppStatus" />
+
+        <Button
+            android:id="@+id/deletePair"
+            style="@style/AppButton"
+            android:layout_marginTop="32dp"
+            android:text="Delete folder pair" />
+
+    </LinearLayout>
+
+</ScrollView>

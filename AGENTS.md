@@ -11,3 +11,19 @@ For any bulk read, query the provider directly instead: `DocumentsContract.build
 Separately, never build a browsing/picker UI around a full recursive walk — load one directory level at a time (`SafLocalStore.listChildren`, and `BrowsePickerActivity`'s drill-down design).
 
 `SafLocalStore.snapshot()` exists only for the sync engine's diffing — don't reuse it for anything that just needs file/folder names. It is cheap only for files it can skip: a file's content is read and hashed unless its size *and* last-modified both match what the last sync recorded. That means a full read for every file on a first sync, for any file the last sync did not record on both sides (local-only files, anything recently un-excluded), and for any file whose provider reported a null size or last-modified.
+
+## Sync runs and pair state
+
+Only one sync runs at a time in this process, and that state lives in `SyncRuns`, not in
+an Activity. Activities are recreated on rotation and can be killed outright, so a
+`syncing` field in one means a recreated screen shows idle buttons and can start a second
+run over the same pair — and two runs both write that pair's entry in `LastSyncStore`,
+where the loser's baseline need not match what was actually transferred. A stale baseline
+is the most dangerous input to the engine: entries with no local counterpart are planned
+as remote deletions. Every trigger (the pair screen, "Sync all", `SyncWorker`) takes the
+same lock, and a screen that finds a run already in progress waits for it instead.
+
+For the same reason, a pair's id is never reused: `SyncPairStore.allocateId` counts from a
+stored counter rather than from the pairs that exist, and `SyncPairStore.remove` deletes
+the pair, its exclusions and its baseline together, so no new pair can inherit them.
+
