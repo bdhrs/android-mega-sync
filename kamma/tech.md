@@ -60,3 +60,12 @@ Single developer/user. Sideloaded, self-built, personal. No Play Store, no multi
 - Model a **sync pair** as a first-class entity (MEGA node handle/path + local SAF tree URI + last-sync state) even though v1 exposes only one. Storing it as a list of one keeps the multi-pair upgrade additive.
 - Keep the **sync engine** (diff + reconcile) independent of UI and of the trigger mechanism, so manual button, WorkManager, and future triggers all call the same engine.
 - Isolate MEGA SDK access behind a thin interface so the engine is testable without a live MEGA account where practical.
+
+## Local scan performance (added 2026-09-02)
+
+The sync's local scan was the app's dominant cost (~2 minutes on the real vault). Three rules now keep it cheap, and all three must be preserved:
+
+- **Never read a SAF tree in bulk through `DocumentFile`.** Its `listFiles()` returns document IDs only, so each child's name, mime type, size and last-modified is a separate ContentProvider query — about four round trips per file. Query the children URI directly with a full projection instead; see `AGENTS.md` for the exact call. `DocumentFile` stays in the per-action write paths, which run once per changed file.
+- **Exclusions are applied during the scan, not after it.** `LocalScanPolicy` carries the `IgnoreRule` into the walk so an excluded folder costs no listings, no reads and no hashing. `SyncEngine` still filters as well; the two are consistent by construction because both are given the same rule.
+- **A file's fingerprint is reused when its size and modification time are unchanged** since the last sync (the fields now stored in `SyncFingerprints`, persisted by `LastSyncCodec` in a backward-compatible 5-column record). This is rsync's default quick-check. Accepted trade-off: an edit that changes neither size nor timestamp is missed until the file is touched again. Modification time is *only* a local cache key — it is never compared between the local and remote sides, so the engine's mtime-independent cross-device content identity is unchanged.
+- Unit tests are plain JUnit with no Robolectric, so nothing that needs a `Context` can be tested. Correctness-critical scan rules therefore live in `LocalScanPolicy` (pure, unit-tested, called by the real walk) rather than inside `SafLocalStore`. Keep new rules there for the same reason.

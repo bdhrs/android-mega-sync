@@ -9,6 +9,7 @@ data class SyncResult(
     val deletedRemote: Int = 0,
     val dirsCreated: Int = 0,
     val cancelled: Boolean = false,
+    val scanSummary: String = "",
     val newState: LastSyncState = LastSyncState.EMPTY
 )
 
@@ -19,7 +20,7 @@ class Synchronizer(
 ) {
 
     // onProgress is called on the calling thread with a short human-readable
-    // status line (scan phases, then "i/N  <action> <path>" per step).
+    // status block: the two scan summaries, then "i/N  <action> <path>" per step.
     fun sync(
         remoteRoot: String,
         last: LastSyncState,
@@ -27,9 +28,14 @@ class Synchronizer(
         shouldCancel: () -> Boolean = { false }
     ): SyncResult {
         onProgress("Scanning local files…")
+        val localStart = System.currentTimeMillis()
         val localSnap = local.snapshot()
-        onProgress("Scanning MEGA…")
+        val localScan = "local ${scanSummary(localSnap, localStart)}"
+        onProgress("$localScan\nScanning MEGA…")
+        val remoteStart = System.currentTimeMillis()
         val remoteSnap = mega.listFolder(remoteRoot)
+        val scans = "$localScan\nmega ${scanSummary(remoteSnap, remoteStart)}"
+        onProgress(scans)
 
         val plan = engine.diff(localSnap, remoteSnap, last)
         val total = plan.actions.size
@@ -46,9 +52,9 @@ class Synchronizer(
             // (we skip Finalising on cancel) is safe.
             if (shouldCancel()) {
                 onProgress("Cancelled")
-                return SyncResult(uploaded, downloaded, deletedLocal, deletedRemote, dirsCreated, cancelled = true, newState = last)
+                return SyncResult(uploaded, downloaded, deletedLocal, deletedRemote, dirsCreated, cancelled = true, scanSummary = scans, newState = last)
             }
-            onProgress("${i + 1}/$total  ${label(action)}")
+            onProgress("$scans\n${i + 1}/$total  ${label(action)}")
             when (action) {
                 is SyncAction.Upload -> {
                     mega.upload(action.path, local.read(action.path)); uploaded++
@@ -90,7 +96,17 @@ class Synchronizer(
             FolderSnapshot(finalLocal.values.toList()),
             FolderSnapshot(finalRemote.values.toList())
         )
-        return SyncResult(uploaded, downloaded, deletedLocal, deletedRemote, dirsCreated, newState = newState)
+        return SyncResult(uploaded, downloaded, deletedLocal, deletedRemote, dirsCreated, scanSummary = scans, newState = newState)
+    }
+
+    // Scan durations are the only signal the user has on device for whether a
+    // scan-speed change actually helped, so they are kept in every later
+    // progress line and in the result — a single status line would otherwise
+    // overwrite them before they could be read.
+    private fun scanSummary(snapshot: FolderSnapshot, startMillis: Long): String {
+        val files = snapshot.entries.count { !it.isDir }
+        val seconds = (System.currentTimeMillis() - startMillis) / 1000.0
+        return "%,d files in %.1fs".format(java.util.Locale.ROOT, files, seconds)
     }
 
     private fun label(action: SyncAction): String = when (action) {

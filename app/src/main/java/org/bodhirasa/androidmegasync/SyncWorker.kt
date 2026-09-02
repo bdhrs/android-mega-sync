@@ -12,6 +12,7 @@ import androidx.work.WorkerParameters
 import org.bodhirasa.androidmegasync.local.SafLocalStore
 import org.bodhirasa.androidmegasync.sync.ExclusionStore
 import org.bodhirasa.androidmegasync.sync.LastSyncStore
+import org.bodhirasa.androidmegasync.sync.LocalScanPolicy
 import org.bodhirasa.androidmegasync.sync.PathListIgnoreRule
 import org.bodhirasa.androidmegasync.sync.SyncEngine
 import org.bodhirasa.androidmegasync.sync.SyncPairStore
@@ -30,9 +31,15 @@ class SyncWorker(context: Context, params: WorkerParameters) : Worker(context, p
         return runCatching {
             val mega = MegaClientProvider.get(applicationContext)
             mega.resumeSession(token)
-            val local = SafLocalStore(applicationContext, Uri.parse(pair.localTreeUri), mega::contentFingerprint)
             val ignore = PathListIgnoreRule(ExclusionStore(applicationContext).load())
-            val result = Synchronizer(mega, local, SyncEngine(ignore = ignore)).sync(pair.remoteRoot, lastSyncStore.load(PAIR_ID))
+            val last = lastSyncStore.load(PAIR_ID)
+            val local = SafLocalStore(
+                applicationContext,
+                Uri.parse(pair.localTreeUri),
+                mega::contentFingerprint,
+                LocalScanPolicy.fromLastSync(ignore, last)
+            )
+            val result = Synchronizer(mega, local, SyncEngine(ignore = ignore)).sync(pair.remoteRoot, last)
             lastSyncStore.save(PAIR_ID, result.newState)
         }.fold(onSuccess = { Result.success() }, onFailure = { Result.retry() })
     }

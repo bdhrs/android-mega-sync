@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import org.bodhirasa.androidmegasync.local.SafLocalStore
 import org.bodhirasa.androidmegasync.sync.ExclusionStore
 import org.bodhirasa.androidmegasync.sync.LastSyncStore
+import org.bodhirasa.androidmegasync.sync.LocalScanPolicy
 import org.bodhirasa.androidmegasync.sync.PathListIgnoreRule
 import org.bodhirasa.androidmegasync.sync.SyncEngine
 import org.bodhirasa.androidmegasync.sync.SyncPair
@@ -153,12 +154,18 @@ class MainActivity : AppCompatActivity() {
             val result = runCatching {
                 ensureSession()
                 val client = MegaClientProvider.get(this)
-                val local = SafLocalStore(this, Uri.parse(pair.localTreeUri), client::contentFingerprint)
                 val ignore = PathListIgnoreRule(ExclusionStore(this).load())
+                val last = lastSyncStore.load(pairId)
+                val local = SafLocalStore(
+                    this,
+                    Uri.parse(pair.localTreeUri),
+                    client::contentFingerprint,
+                    LocalScanPolicy.fromLastSync(ignore, last)
+                )
                 val sync = Synchronizer(client, local, SyncEngine(ignore = ignore))
                 sync.sync(
                     pair.remoteRoot,
-                    lastSyncStore.load(pairId),
+                    last,
                     onProgress = { msg -> runOnUiThread { status.text = msg } },
                     shouldCancel = { cancelRequested }
                 ).also {
@@ -174,7 +181,7 @@ class MainActivity : AppCompatActivity() {
                         val head = if (it.cancelled) "Sync cancelled" else "Sync done"
                         "$head — up ${it.uploaded}, down ${it.downloaded}, " +
                             "del local ${it.deletedLocal}, del mega ${it.deletedRemote}, " +
-                            "dirs ${it.dirsCreated}"
+                            "dirs ${it.dirsCreated}\n${it.scanSummary}"
                     },
                     onFailure = { "Sync failed: ${it.message}" }
                 )
