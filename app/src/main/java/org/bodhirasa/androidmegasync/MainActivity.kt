@@ -5,13 +5,16 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import org.bodhirasa.androidmegasync.local.SafLocalStore
+import org.bodhirasa.androidmegasync.sync.ExclusionStore
 import org.bodhirasa.androidmegasync.sync.LastSyncStore
+import org.bodhirasa.androidmegasync.sync.PathListIgnoreRule
 import org.bodhirasa.androidmegasync.sync.SyncEngine
 import org.bodhirasa.androidmegasync.sync.SyncPair
 import org.bodhirasa.androidmegasync.sync.SyncPairStore
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lastSyncStore: LastSyncStore
     private lateinit var status: TextView
     private lateinit var syncButton: Button
+    private lateinit var lockableButtons: List<Button>
 
     @Volatile
     private var sessionResumed = false
@@ -72,12 +76,21 @@ class MainActivity : AppCompatActivity() {
         syncButton = findViewById(R.id.syncNow)
         setSyncButton(cancel = false)
 
-        findViewById<Button>(R.id.pickLocal).setOnClickListener { pickLocal.launch(null) }
-        findViewById<Button>(R.id.pickRemote).setOnClickListener { browseRemote() }
+        val pickLocalButton = findViewById<Button>(R.id.pickLocal)
+        val pickRemoteButton = findViewById<Button>(R.id.pickRemote)
+        val exclusionsButton = findViewById<Button>(R.id.exclusions)
+        val logoutButton = findViewById<Button>(R.id.logout)
+        lockableButtons = listOf(pickLocalButton, pickRemoteButton, exclusionsButton, logoutButton)
+
+        pickLocalButton.setOnClickListener { pickLocal.launch(null) }
+        pickRemoteButton.setOnClickListener { browseRemote() }
+        exclusionsButton.setOnClickListener {
+            startActivity(Intent(this, ExclusionsActivity::class.java))
+        }
         syncButton.setOnClickListener {
             if (syncing) cancelRequested = true else syncNow()
         }
-        findViewById<Button>(R.id.logout).setOnClickListener {
+        logoutButton.setOnClickListener {
             SessionStore(this).clear()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -134,13 +147,15 @@ class MainActivity : AppCompatActivity() {
         syncing = true
         cancelRequested = false
         setSyncButton(cancel = true)
+        lockableButtons.forEach { it.isEnabled = false }
         status.text = "Syncing…"
         Thread {
             val result = runCatching {
                 ensureSession()
                 val client = MegaClientProvider.get(this)
                 val local = SafLocalStore(this, Uri.parse(pair.localTreeUri), client::contentFingerprint)
-                val sync = Synchronizer(client, local, SyncEngine())
+                val ignore = PathListIgnoreRule(ExclusionStore(this).load())
+                val sync = Synchronizer(client, local, SyncEngine(ignore = ignore))
                 sync.sync(
                     pair.remoteRoot,
                     lastSyncStore.load(pairId),
@@ -153,11 +168,12 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 syncing = false
                 setSyncButton(cancel = false)
+                lockableButtons.forEach { it.isEnabled = true }
                 status.text = result.fold(
                     onSuccess = {
                         val head = if (it.cancelled) "Sync cancelled" else "Sync done"
                         "$head — up ${it.uploaded}, down ${it.downloaded}, " +
-                            "del local ${it.deletedLocal}, del remote ${it.deletedRemote}, " +
+                            "del local ${it.deletedLocal}, del mega ${it.deletedRemote}, " +
                             "dirs ${it.dirsCreated}"
                     },
                     onFailure = { "Sync failed: ${it.message}" }
@@ -168,8 +184,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun render() {
         val pair = pairStore.single()
-        val local = pair?.localTreeUri?.takeIf { it.isNotEmpty() } ?: "(none)"
+        val local = pair?.localTreeUri?.takeIf { it.isNotEmpty() }?.let { readableLocalPath(it) } ?: "(none)"
         val remote = pair?.remoteRoot?.takeIf { it.isNotEmpty() } ?: "(vault root)"
-        status.text = "Local: $local\nRemote: $remote"
+        status.text = "Local: $local\nMEGA: $remote"
     }
+
+    private fun readableLocalPath(uriString: String): String = runCatching {
+        val docId = DocumentsContract.getTreeDocumentId(Uri.parse(uriString))
+        docId.substringAfter(':', docId)
+    }.getOrDefault(uriString)
 }

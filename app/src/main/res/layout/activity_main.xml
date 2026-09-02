@@ -25,6 +25,12 @@
         android:text="Pick MEGA folder" />
 
     <Button
+        android:id="@+id/exclusions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Exclusions" />
+
+    <Button
         android:id="@+id/syncNow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

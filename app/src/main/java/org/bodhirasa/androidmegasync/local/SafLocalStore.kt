@@ -23,6 +23,18 @@ class SafLocalStore(
         return FolderSnapshot(entries)
     }
 
+    // Lists only the immediate children of `path` (name, isDir) — no content read,
+    // no recursion. Each SAF listFiles() call is its own ContentProvider round trip,
+    // so walking a whole tree upfront (as snapshot() does, for sync diffing) is far
+    // too slow for a browse/pick UI; one level at a time keeps each screen fast.
+    fun listChildren(path: String): List<Pair<String, Boolean>> {
+        val dir = if (path.isEmpty()) root else resolve(path) ?: return emptyList()
+        return dir.listFiles().mapNotNull { child ->
+            val name = child.name ?: return@mapNotNull null
+            name to child.isDirectory
+        }
+    }
+
     private fun walk(dir: DocumentFile, prefix: String, out: MutableList<FileEntry>) {
         for (child in dir.listFiles()) {
             val name = child.name ?: continue

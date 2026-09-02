@@ -138,6 +138,17 @@ class SyncEngineTest {
     }
 
     @Test
+    fun excludedFolderIsSkippedEntirely() {
+        val engineWithIgnore = SyncEngine(ignore = PathListIgnoreRule(listOf("archive")))
+        val plan = engineWithIgnore.diff(
+            snap(dir("archive"), file("archive/old.md", "x"), file("note.md", "v1")),
+            snap(),
+            LastSyncState.EMPTY
+        )
+        assertEquals(listOf(SyncAction.Upload("note.md")), plan.actions)
+    }
+
+    @Test
     fun newNestedDirsMakeParentBeforeChildOnRemote() {
         val plan = engine.diff(
             snap(dir("docs"), dir("docs/sub"), file("docs/sub/a.md", "v1")),

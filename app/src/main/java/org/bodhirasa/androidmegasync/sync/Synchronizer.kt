@@ -97,7 +97,7 @@ class Synchronizer(
         is SyncAction.Upload -> "↑ ${action.path}"
         is SyncAction.Download -> "↓ ${action.path}"
         is SyncAction.DeleteLocal -> "✕ local ${action.path}"
-        is SyncAction.DeleteRemote -> "✕ remote ${action.path}"
+        is SyncAction.DeleteRemote -> "✕ mega ${action.path}"
         is SyncAction.MakeDirLocal, is SyncAction.MakeDirRemote -> "+ dir ${action.path}"
     }
 }

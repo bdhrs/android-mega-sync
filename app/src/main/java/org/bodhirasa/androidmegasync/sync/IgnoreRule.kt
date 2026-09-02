@@ -8,6 +8,14 @@ fun interface IgnoreRule {
     }
 }
 
+class PathListIgnoreRule(paths: List<String>) : IgnoreRule {
+
+    private val excluded = paths.toSet()
+
+    override fun isIgnored(path: String): Boolean =
+        path in excluded || excluded.any { path.startsWith("$it/") }
+}
+
 class GlobIgnoreRule(globs: List<String>) : IgnoreRule {
 
     private val regexes = globs.map { it.globToRegex() }

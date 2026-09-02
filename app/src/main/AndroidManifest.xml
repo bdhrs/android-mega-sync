@@ -24,6 +24,14 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ExclusionsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".BrowsePickerActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
