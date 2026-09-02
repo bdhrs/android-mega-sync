@@ -1,4 +1,4 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
 // Reconciles a local and remote folder against the last-synced baseline.
 //

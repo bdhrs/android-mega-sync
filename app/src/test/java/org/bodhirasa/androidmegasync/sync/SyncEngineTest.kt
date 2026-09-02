@@ -1,4 +1,4 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

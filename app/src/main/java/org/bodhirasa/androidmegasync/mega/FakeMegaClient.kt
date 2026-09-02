@@ -1,8 +1,8 @@
-package org.bodhirasa.sama.mega
+package org.bodhirasa.androidmegasync.mega
 
-import org.bodhirasa.sama.sync.FileEntry
-import org.bodhirasa.sama.sync.Fingerprints
-import org.bodhirasa.sama.sync.FolderSnapshot
+import org.bodhirasa.androidmegasync.sync.FileEntry
+import org.bodhirasa.androidmegasync.sync.Fingerprints
+import org.bodhirasa.androidmegasync.sync.FolderSnapshot
 
 class FakeMegaClient(
     seedFiles: Map<String, ByteArray> = emptyMap(),

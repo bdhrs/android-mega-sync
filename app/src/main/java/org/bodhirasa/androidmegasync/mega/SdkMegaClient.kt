@@ -1,8 +1,8 @@
-package org.bodhirasa.sama.mega
+package org.bodhirasa.androidmegasync.mega
 
-import org.bodhirasa.sama.sync.FileEntry
-import org.bodhirasa.sama.sync.Fingerprints
-import org.bodhirasa.sama.sync.FolderSnapshot
+import org.bodhirasa.androidmegasync.sync.FileEntry
+import org.bodhirasa.androidmegasync.sync.Fingerprints
+import org.bodhirasa.androidmegasync.sync.FolderSnapshot
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -74,7 +74,7 @@ class SdkMegaClient(
     }
 
     override fun contentFingerprint(content: ByteArray): String {
-        val temp = File.createTempFile("sama-fp", null, cacheDir)
+        val temp = File.createTempFile("ams-fp", null, cacheDir)
         return try {
             temp.writeBytes(content)
             contentId(content.size.toLong(), api.getCRC(temp.absolutePath))
@@ -85,7 +85,7 @@ class SdkMegaClient(
 
     override fun download(remotePath: String): ByteArray {
         val node = nodeFor(remotePath) ?: error("No remote node at $remotePath")
-        val temp = File.createTempFile("sama-dl", null, cacheDir)
+        val temp = File.createTempFile("ams-dl", null, cacheDir)
         try {
             awaitTransfer { api.startDownload(node, temp.absolutePath, null, null, false, null, MegaTransfer.COLLISION_CHECK_FINGERPRINT, MegaTransfer.COLLISION_RESOLUTION_OVERWRITE, it) }
             return temp.readBytes()
@@ -98,7 +98,7 @@ class SdkMegaClient(
         val parentPath = remotePath.substringBeforeLast('/', "")
         val name = remotePath.substringAfterLast('/')
         val parent = nodeFor(parentPath) ?: error("No remote parent for $remotePath")
-        val temp = File.createTempFile("sama-up", null, cacheDir)
+        val temp = File.createTempFile("ams-up", null, cacheDir)
         try {
             temp.writeBytes(content)
             awaitTransfer { api.startUpload(temp.absolutePath, parent, name, temp.lastModified() / 1000, null, true, false, null, it) }

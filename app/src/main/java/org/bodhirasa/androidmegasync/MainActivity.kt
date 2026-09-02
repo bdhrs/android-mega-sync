@@ -1,4 +1,4 @@
-package org.bodhirasa.sama
+package org.bodhirasa.androidmegasync
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -10,12 +10,12 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import org.bodhirasa.sama.local.SafLocalStore
-import org.bodhirasa.sama.sync.LastSyncStore
-import org.bodhirasa.sama.sync.SyncEngine
-import org.bodhirasa.sama.sync.SyncPair
-import org.bodhirasa.sama.sync.SyncPairStore
-import org.bodhirasa.sama.sync.Synchronizer
+import org.bodhirasa.androidmegasync.local.SafLocalStore
+import org.bodhirasa.androidmegasync.sync.LastSyncStore
+import org.bodhirasa.androidmegasync.sync.SyncEngine
+import org.bodhirasa.androidmegasync.sync.SyncPair
+import org.bodhirasa.androidmegasync.sync.SyncPairStore
+import org.bodhirasa.androidmegasync.sync.Synchronizer
 
 class MainActivity : AppCompatActivity() {
 

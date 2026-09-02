@@ -1,9 +1,9 @@
-package org.bodhirasa.sama
+package org.bodhirasa.androidmegasync
 
 import android.content.Context
-import org.bodhirasa.sama.mega.FakeMegaClient
-import org.bodhirasa.sama.mega.MegaClient
-import org.bodhirasa.sama.mega.SdkMegaClient
+import org.bodhirasa.androidmegasync.mega.FakeMegaClient
+import org.bodhirasa.androidmegasync.mega.MegaClient
+import org.bodhirasa.androidmegasync.mega.SdkMegaClient
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 
@@ -13,8 +13,8 @@ import java.io.File
 object MegaClientProvider {
 
     private const val USE_FAKE = false
-    private const val APP_KEY = "SamaSync"
-    private const val USER_AGENT = "Sama/0.1"
+    private const val APP_KEY = "AndroidMegaSync"
+    private const val USER_AGENT = "AndroidMegaSync/0.1"
 
     @Volatile
     private var instance: MegaClient? = null

@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "sama"
+rootProject.name = "android-mega-sync"
 include(":app")

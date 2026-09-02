@@ -1,4 +1,4 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
 import android.content.Context
 

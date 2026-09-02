@@ -1,4 +1,4 @@
-# Sama
+# Android Mega Sync
 
 A lightweight, ad-free Android app that keeps a folder in a [MEGA](https://mega.nz) account in
 **two-way sync** with a local folder on your phone. Built to replace bloated third-party MEGA sync
@@ -44,7 +44,7 @@ See [`mega/BUILD_SDK.md`](mega/BUILD_SDK.md) for the exact SDK build steps.
 
 ## First run
 
-1. `just deploy`, open Sama, log in with your MEGA email/password.
+1. `just deploy`, open Android Mega Sync, log in with your MEGA email/password.
 2. **Pick MEGA folder** (vault root or a subfolder) and **Pick local folder**.
 3. **Sync now**. After that a background job re-syncs roughly every 6 hours when on a network.
 
@@ -74,7 +74,7 @@ additive.
 ## Layout
 
 ```
-app/src/main/java/org/bodhirasa/sama/
+app/src/main/java/org/bodhirasa/androidmegasync/
   sync/      SyncEngine, Synchronizer, SyncAction/Plan, LocalStore,
              LastSyncState, IgnoreRule, FileEntry, SyncPair…
   mega/      MegaClient, SdkMegaClient, FakeMegaClient

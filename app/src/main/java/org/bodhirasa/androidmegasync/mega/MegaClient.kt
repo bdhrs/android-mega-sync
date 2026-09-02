@@ -1,6 +1,6 @@
-package org.bodhirasa.sama.mega
+package org.bodhirasa.androidmegasync.mega
 
-import org.bodhirasa.sama.sync.FolderSnapshot
+import org.bodhirasa.androidmegasync.sync.FolderSnapshot
 
 interface MegaClient {
 

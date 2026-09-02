@@ -1,4 +1,4 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
 // The local and remote fingerprints a file had at the last successful sync.
 // The two sides use different fingerprint schemes and are never compared to

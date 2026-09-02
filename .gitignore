@@ -12,7 +12,7 @@ local.properties
 .claude/
 
 # Local fallback snapshots
-sama-fallback-*.tar.gz
+android-mega-sync-fallback-*.tar.gz
 
 # MEGA SDK — source + build inputs (clone/build via mega/BUILD_SDK.md)
 mega/sdk/

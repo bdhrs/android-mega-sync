@@ -1,6 +1,6 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
-import org.bodhirasa.sama.mega.FakeMegaClient
+import org.bodhirasa.androidmegasync.mega.FakeMegaClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

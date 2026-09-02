@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sama — MEGA folder sync"
+        android:text="Android Mega Sync — MEGA folder sync"
         android:textSize="20sp"
         android:paddingBottom="24dp" />
 

@@ -1,12 +1,12 @@
-package org.bodhirasa.sama.local
+package org.bodhirasa.androidmegasync.local
 
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
-import org.bodhirasa.sama.sync.FileEntry
-import org.bodhirasa.sama.sync.Fingerprints
-import org.bodhirasa.sama.sync.FolderSnapshot
-import org.bodhirasa.sama.sync.LocalStore
+import org.bodhirasa.androidmegasync.sync.FileEntry
+import org.bodhirasa.androidmegasync.sync.Fingerprints
+import org.bodhirasa.androidmegasync.sync.FolderSnapshot
+import org.bodhirasa.androidmegasync.sync.LocalStore
 
 class SafLocalStore(
     private val context: Context,

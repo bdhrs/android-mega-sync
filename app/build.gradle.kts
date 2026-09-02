@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "org.bodhirasa.sama"
+    namespace = "org.bodhirasa.androidmegasync"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "org.bodhirasa.sama"
+        applicationId = "org.bodhirasa.androidmegasync"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

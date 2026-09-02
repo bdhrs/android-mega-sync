@@ -1,4 +1,4 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
 class InMemoryLocalStore(
     seedFiles: Map<String, ByteArray> = emptyMap(),

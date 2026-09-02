@@ -1,4 +1,4 @@
-package org.bodhirasa.sama
+package org.bodhirasa.androidmegasync
 
 import android.content.Context
 import android.net.Uri
@@ -9,11 +9,11 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import org.bodhirasa.sama.local.SafLocalStore
-import org.bodhirasa.sama.sync.LastSyncStore
-import org.bodhirasa.sama.sync.SyncEngine
-import org.bodhirasa.sama.sync.SyncPairStore
-import org.bodhirasa.sama.sync.Synchronizer
+import org.bodhirasa.androidmegasync.local.SafLocalStore
+import org.bodhirasa.androidmegasync.sync.LastSyncStore
+import org.bodhirasa.androidmegasync.sync.SyncEngine
+import org.bodhirasa.androidmegasync.sync.SyncPairStore
+import org.bodhirasa.androidmegasync.sync.Synchronizer
 import java.util.concurrent.TimeUnit
 
 class SyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {

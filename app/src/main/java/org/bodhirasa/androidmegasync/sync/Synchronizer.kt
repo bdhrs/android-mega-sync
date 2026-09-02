@@ -1,6 +1,6 @@
-package org.bodhirasa.sama.sync
+package org.bodhirasa.androidmegasync.sync
 
-import org.bodhirasa.sama.mega.MegaClient
+import org.bodhirasa.androidmegasync.mega.MegaClient
 
 data class SyncResult(
     val uploaded: Int = 0,

@@ -2,7 +2,7 @@
 
 The app uses the official [`meganz/sdk`](https://github.com/meganz/sdk) (BSD-2-Clause), built
 from source into a native `.so` plus SWIG-generated Java bindings. There is no Maven artifact.
-This document reproduces that build. Everything stays under `sama/mega/`.
+This document reproduces that build. Everything stays under `android-mega-sync/mega/`.
 
 ## Outputs consumed by the app
 
@@ -24,7 +24,7 @@ Also required (already present on this machine): JDK 17, Android NDK r27 (`~/And
 ## Build steps
 
 ```bash
-cd sama/mega
+cd android-mega-sync/mega
 
 # 1. Clone the SDK (shallow) and project-local vcpkg.
 git clone --depth 1 https://github.com/meganz/sdk.git sdk
@@ -59,7 +59,7 @@ cmake --build build -j"$(nproc)"
 ## Install into the app
 
 ```bash
-cd sama
+cd android-mega-sync
 STRIP=~/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
 
 # These output dirs are gitignored, so create them on a fresh clone.

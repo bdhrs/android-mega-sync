@@ -1,4 +1,4 @@
-# Sama — MEGA folder sync. Run `just` to list recipes.
+# Android Mega Sync — MEGA folder sync. Run `just` to list recipes.
 
 set shell := ["bash", "-cu"]
 

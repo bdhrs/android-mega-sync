@@ -1,4 +1,4 @@
-package org.bodhirasa.sama
+package org.bodhirasa.androidmegasync
 
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
