@@ -1,16 +1,18 @@
 # Android Mega Sync
 
-A lightweight, ad-free Android app that keeps a folder in a [MEGA](https://mega.nz) account in
-**two-way sync** with a local folder on your phone. Built to replace bloated third-party MEGA sync
-apps. Primary use case: keeping an Obsidian vault in sync.
+A lightweight, ad-free Android app that keeps folders in a [MEGA](https://mega.nz) account in
+**two-way sync** with local folders on your phone — any number of pairs, each with its own
+exclusion list. Built to replace bloated third-party MEGA sync apps. Primary use case: keeping an
+Obsidian vault in sync.
 
 It talks to MEGA through the official [MEGA SDK](https://github.com/meganz/sdk) (BSD-2-Clause), built
 from source — no protocol reverse-engineering, no untrusted binaries.
 
 ## Features
 
-- **Bidirectional sync** of one MEGA folder ↔ one local folder.
-- **Manual "Sync now"** plus a periodic background sync (~6h) via WorkManager.
+- **Bidirectional sync** of any number of MEGA folder ↔ local folder pairs, each with its own
+  exclusion list.
+- **Manual "Sync now"** plus a periodic background sync (~6h) via WorkManager, run per pair.
 - **Last-writer-wins**: each side is compared only to its own state at the last sync; when a file
   changed on both sides, the newer modification time wins. No silent loss except in the rare case of
   editing the *same* file on two devices between syncs.
@@ -45,8 +47,10 @@ See [`mega/BUILD_SDK.md`](mega/BUILD_SDK.md) for the exact SDK build steps.
 ## First run
 
 1. `just deploy`, open Android Mega Sync, log in with your MEGA email/password.
-2. **Pick MEGA folder** (vault root or a subfolder) and **Pick local folder**.
-3. **Sync now**. After that a background job re-syncs roughly every 6 hours when on a network.
+2. Add a pair: **pick MEGA folder** (vault root or a subfolder) and **pick local folder**. Add more
+   pairs the same way; each gets its own exclusion list.
+3. **Sync now**. After that a background job re-syncs every pair roughly every 6 hours when on a
+   network.
 
 ## Architecture
 
@@ -67,9 +71,8 @@ Synchronizer ──► SyncEngine.diff() ──► SyncPlan      (pure function,
 interface plus `LocalStore`, so the entire engine is unit-tested offline against `FakeMegaClient` (no
 account needed), and upgrading the MEGA SDK touches only `SdkMegaClient`.
 
-**Extensible to multiple folder pairs:** `SyncPair` is a first-class entity and `SyncPairStore`
-already persists a list (currently of one); everything is keyed per pair, so multi-pair support is
-additive.
+**Multiple folder pairs:** `SyncPair` is a first-class entity; `SyncPairStore` persists the list and
+`ExclusionStore` keys exclusions per pair.
 
 ## Layout
 
@@ -79,7 +82,8 @@ app/src/main/java/org/bodhirasa/androidmegasync/
              LastSyncState, IgnoreRule, FileEntry, SyncPair…
   mega/      MegaClient, SdkMegaClient, FakeMegaClient
   local/     SafLocalStore (Storage Access Framework)
-  *Activity, MegaClientProvider, SessionStore (encrypted), SyncWorker
+  LoginActivity, MainActivity, PairActivity, BrowsePickerActivity, ExclusionsActivity,
+             MegaClientProvider, SessionStore (encrypted), SyncWorker
 app/src/test/                       unit tests
 app/src/megasdk/ , jniLibs/         vendored MEGA SDK bindings + libmega.so (generated, gitignored)
 mega/BUILD_SDK.md                   how to build the MEGA SDK from source
